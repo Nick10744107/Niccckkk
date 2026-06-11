@@ -16,47 +16,53 @@
 
       <form @submit.prevent="handleSubmit" class="space-y-5">
         <div>
-          <label
-            class="block text-xs font-medium text-white/50 tracking-wider uppercase mb-2"
-            >姓名</label
+          <Label
+            for="contact-name"
+            class="text-xs font-medium text-white/50 tracking-wider uppercase mb-2"
+            >姓名</Label
           >
-          <input
+          <Input
+            id="contact-name"
             v-model="form.name"
             type="text"
             placeholder="Your name"
-            class="w-full px-5 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-violet-500/60 focus:bg-white/[0.07] transition-all duration-300"
+            class="h-auto px-5 py-3.5 bg-white/5 rounded-xl text-base text-white placeholder:text-white/20 focus-visible:border-violet-500/60 focus-visible:ring-violet-500/20 focus-visible:bg-white/[0.07] transition-all duration-300"
           />
         </div>
         <div>
-          <label
-            class="block text-xs font-medium text-white/50 tracking-wider uppercase mb-2"
-            >Email</label
+          <Label
+            for="contact-email"
+            class="text-xs font-medium text-white/50 tracking-wider uppercase mb-2"
+            >Email</Label
           >
-          <input
+          <Input
+            id="contact-email"
             v-model="form.email"
             type="email"
             placeholder="your@email.com"
-            class="w-full px-5 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-violet-500/60 focus:bg-white/[0.07] transition-all duration-300"
+            class="h-auto px-5 py-3.5 bg-white/5 rounded-xl text-base text-white placeholder:text-white/20 focus-visible:border-violet-500/60 focus-visible:ring-violet-500/20 focus-visible:bg-white/[0.07] transition-all duration-300"
           />
         </div>
         <div>
-          <label
-            class="block text-xs font-medium text-white/50 tracking-wider uppercase mb-2"
-            >訊息</label
+          <Label
+            for="contact-message"
+            class="text-xs font-medium text-white/50 tracking-wider uppercase mb-2"
+            >訊息</Label
           >
-          <textarea
+          <Textarea
+            id="contact-message"
             v-model="form.message"
-            rows="5"
+            :rows="5"
             placeholder="Tell me about your project..."
-            class="w-full px-5 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-violet-500/60 focus:bg-white/[0.07] transition-all duration-300 resize-none"
+            class="px-5 py-3.5 bg-white/5 rounded-xl text-base text-white placeholder:text-white/20 focus-visible:border-violet-500/60 focus-visible:ring-violet-500/20 focus-visible:bg-white/[0.07] transition-all duration-300 resize-none"
           />
         </div>
-        <button
+        <Button
           type="submit"
-          class="w-full py-4 bg-linear-to-r from-violet-600 to-pink-600 text-white rounded-xl font-semibold hover:opacity-90 hover:scale-[1.02] transition-all duration-300 tracking-wide"
+          class="w-full h-auto py-4 bg-linear-to-r from-violet-600 to-pink-600 text-white rounded-xl text-base font-semibold hover:opacity-90 hover:scale-[1.02] transition-all duration-300 tracking-wide"
         >
           送出訊息 →
-        </button>
+        </Button>
       </form>
 
       <div
