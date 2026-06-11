@@ -1,6 +1,6 @@
 ---
 name: website-dev
-description: Nick 個人網站(Vue 3 + Tailwind CSS 4 + Vite)的開發規範與設計系統。凡是要對這個網站做任何開發工作 — 新增區塊(section)、修改元件、加作品到 Projects、調整樣式、更新內容文案、改 NavBar 連結 — 都務必先使用這個 skill,即使只是小改動,因為網站有一套嚴格的視覺設計系統(深色底、violet/pink 漸層、白色透明度階層)和元件結構慣例,不照規範寫出來的東西會明顯格格不入。
+description: Nick 個人網站(Vue 3 + Tailwind CSS 4 + Vite)的開發規範與設計系統。凡是要對這個網站做任何開發工作 — 新增區塊(section)、修改元件、加作品到 Projects、調整樣式、更新內容文案、改 NavBar 連結 — 都務必先使用這個 skill,即使只是小改動,因為網站有一套嚴格的視覺設計系統(像素街機風:亮冷白底、獨行俠藍系、像素字、零圓角硬陰影)和元件結構慣例,不照規範寫出來的東西會明顯格格不入。
 ---
 
 # Nick 個人網站開發規範
@@ -31,6 +31,8 @@ src/
 │   ├── ui/              # shadcn-vue 產生的元件(button、input、card…),勿手動大改
 │   ├── NavBar.vue
 │   ├── HeroSection.vue
+│   ├── SnakeScreen.vue  # Hero 的可玩貪食蛇(CRT 螢幕)
+│   ├── PixelMarquee.vue # 跑馬燈飾帶
 │   ├── ProjectsSection.vue
 │   ├── ContactSection.vue
 │   └── FooterBar.vue
@@ -46,28 +48,37 @@ src/
 
 ## 設計系統(最重要的部分)
 
-Tailwind CSS 4 語法注意:漸層用 `bg-linear-to-r`/`bg-linear-to-b`(不是 v3 的 `bg-gradient-to-r`);任意值如 `blur-[120px]`、`bg-size-[72px_72px]` 照舊可用。
+**概念:像素街機/掌上遊戲機 × 現代亮色藍**,從站主的貪食蛇作品延伸 — 亮冷白頁面 + 獨行俠(Dallas Mavericks)藍系配色,深色只出現在 Hero 的 CRT 螢幕裡(那是一台可玩的貪食蛇,整站的招牌)。不要做成全黑科技風、紫色漸層風,也不要回到米色復古配色。
 
-### 色彩
+### 色彩(自訂 token,定義在 `src/style.css` 的 `@theme`)
 
-- 背景:純黑 `bg-black` 與 `bg-neutral-950` 交替使用,讓相鄰區塊有層次
-- 強調色:violet 為主、pink 為輔。漸層文字/按鈕用 `from-violet-400 to-pink-400`(文字)或 `from-violet-600 to-pink-600`(按鈕底)
-- 文字階層全部用白色 + 透明度,**不要用灰色色票**:
-  - 主標題 `text-white`
-  - 副文字 `text-white/70` 或 `text-white/50`
-  - 弱化資訊 `text-white/40`、`text-white/30`
-  - 極弱(footer)`text-white/20`
-- 邊框:`border-white/10`,hover 時提升為 `border-violet-500/50` 或 `border-white/50`
+- `bg-shell`(#F3F5F8 亮冷白):頁面/區塊底色,與 `bg-white` 交替做層次
+- `text-ink` / `border-ink`(#0B2440 海軍藍):文字、邊框、硬陰影(硬陰影 hex 寫死處一律用 #0b2440)
+- `snake`(#00538C 皇家藍,Mavs blue):主強調 — 主按鈕底、hover、重點字
+- `apple`(#2F9DE0 天空藍):次強調 — 卡帶色條交替、CONTINUE? 等
+- `crt`(#071A2E 螢幕深藍)與 `phosphor`(#54C2FF 亮青藍):**只能用在 CRT 螢幕元件內**,不要外流到頁面;canvas 內食物保留蘋果紅 #E5484D 做對比
+- 文字階層用 ink + 透明度:主文 `text-ink`、副文 `text-ink/60-70`、弱化 `text-ink/40-50`、極弱 `text-ink/30`
+
+### 字體
+
+- `font-pixel`(Cubic 11 俐方體11號,繁中像素字,自架於 `src/assets/fonts/`):標題、眉標、按鈕、標籤、NavBar — 所有「遊戲機 UI」的部分
+- 內文敘述用預設 `font-sans`(system-ui)確保易讀;**長段落不要用像素字**
+
+### 版式語言:零圓角 + 硬陰影
+
+- 全站零圓角(shadcn `--radius: 0rem`)
+- 盒子一律用 `pixel-box` utility(2px 墨黑邊框 + `4px 4px 0` 不模糊硬陰影,定義在 style.css)
+- hover 慣例:`hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#0b2440] transition-all duration-150`(位移 + 陰影加深,模擬實體按鍵)
+- **禁用**:模糊光暈(blur glow)、玻璃擬態、漸層底、`rounded-*`
 
 ### 每個 section 的固定骨架
 
 ```html
-<section id="xxx" class="py-32 px-6 bg-neutral-950">  <!-- 或 bg-black -->
-  <div class="max-w-6xl mx-auto">                      <!-- 窄內容用 max-w-xl/3xl -->
-    <!-- 標題區:violet 小眉標 + 大標 -->
-    <div class="mb-16">
-      <p class="text-violet-400 text-xs tracking-widest uppercase mb-3">English Eyebrow</p>
-      <h2 class="text-4xl font-bold text-white">中文標題</h2>
+<section id="xxx" class="py-28 px-6 bg-shell">  <!-- 或 bg-white + border-y-2 border-ink -->
+  <div class="max-w-5xl mx-auto">
+    <div class="mb-14">
+      <p class="font-pixel text-snake text-sm mb-3">▸ ENGLISH EYEBROW</p>
+      <h2 class="font-pixel text-4xl text-ink">中文標題</h2>
     </div>
     <!-- 內容 -->
   </div>
@@ -76,29 +87,32 @@ Tailwind CSS 4 語法注意:漸層用 `bg-linear-to-r`/`bg-linear-to-b`(不是 v
 
 ### 常用元件模式
 
-- **卡片**:`bg-white/5 border border-white/10 rounded-2xl p-7`,hover 用 `hover:border-violet-500/50 hover:bg-white/[0.07] transition-all duration-300`,搭配 `group` 做內部元素的 hover 連動
-- **標籤(pill)**:`text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60`
-- **主要按鈕**:白底黑字 `px-8 py-3.5 bg-white text-black rounded-full font-semibold hover:bg-white/90 hover:scale-105` 或漸層 `bg-linear-to-r from-violet-600 to-pink-600 rounded-xl`
-- **次要按鈕**:描邊 `border border-white/20 text-white rounded-full hover:border-white/50 hover:bg-white/5`
-- **背景光暈(glow)**:大區塊可加 `absolute ... bg-violet-600/10 rounded-full blur-[100px] pointer-events-none`,記得父層 `relative overflow-hidden`
-- **輸入框**:`bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:border-violet-500/60`
-- 所有互動元素都要有 `transition-all duration-300`(或 `transition-colors duration-200/300`)
+- **卡帶卡片**(見 ProjectsSection):`pixel-box bg-shell` + 頂部色條 `h-3 border-b-2 border-ink`(皇家藍/天空藍交替)+ 右上 `CART.01` 編號
+- **跑馬燈飾帶**:`<PixelMarquee :items="[...]" variant="snake|apple|ink" />`,放在 section 之間;**棋盤格飾帶** `checker-strip` utility(見 FooterBar)
+- **捲動進場**:元素加 `data-reveal`(觀察器在 App.vue),多張卡片用 `animationDelay` 錯開
+- **標籤(chip)**:`font-pixel text-xs px-2 py-1 bg-white border-2 border-ink text-ink`(方形,不是圓 pill)
+- **主要按鈕**:`pixel-box font-pixel bg-snake text-white px-7 py-3` + hover 慣例
+- **次要按鈕**:`pixel-box font-pixel bg-white text-ink px-7 py-3` + hover 慣例
+- **閃爍游標/指示**:`animate-blink-px`(style.css 內建,已處理 prefers-reduced-motion)
+- CRT 螢幕類元件參考 `SnakeScreen.vue`:`pixel-box bg-ink` 外框 + `bg-crt` 畫面 + `text-phosphor` 文字 + `[image-rendering:pixelated]`
 
 ### 文案語言慣例
 
-UI 是中英混排,有固定分工:
+UI 是中英混排,帶遊戲機語感:
 
-- 眉標(eyebrow)、badge、NavBar 連結、小型 UI 標籤 → **英文大寫間距字**(`tracking-widest uppercase`),如 "Portfolio"、"Get in touch"
-- 區塊主標題、敘述文字、按鈕文字 → **繁體中文**,如「精選作品」「聯絡我」「查看作品」
+- 眉標、badge、NavBar、小標籤 → **像素字英文大寫**,可帶遊戲梗:"▸ SELECT GAME"、"PLAYER 1"、"CONTINUE?"、"CART.01"
+- 區塊主標題、敘述、按鈕文字 → **繁體中文**:「精選作品」「聯絡我」「查看作品 ▸」
+- 遊戲梗點到為止,一個區塊最多一個,不要堆砌
 
 ## UI 元件(shadcn-vue)
 
 需要互動性元件(按鈕、表單、對話框、下拉選單、tooltip 等)時,優先用 shadcn-vue,不要從零手刻:
 
 - 已安裝:button、input、textarea、label、badge、card。缺什麼就先裝:`npx shadcn-vue@latest add <name>`(專案是 JavaScript 模式,CLI 會自動產生 .js/.vue)
+- 注意:專案裡另裝有通用的 `shadcn` skill,它教的是 React 版 CLI(`npx shadcn@latest`)— **在這個專案一律改用 `npx shadcn-vue@latest`**,本 skill 的規範優先
 - **元件全部自動匯入**(`unplugin-vue-components`,掃描 `src/components/` 全目錄):template 直接寫 `<Button>`、`<NavBar />` 即可,**不要**手寫元件的 import 陳述式(寫了也能動,但違反專案慣例)。僅限元件;`ref`、`cn()` 等函式仍需手動 import
-- 主題已調校:`src/style.css` 的 `:root` CSS 變數已對應網站設計系統(`--background` 純黑、`--primary` 白、`--ring` violet、`--border` white/10、`--radius` 0.75rem)。**網站是永久深色,不使用 `.dark` class 切換**
-- 元件預設樣式已大致貼合網站,但仍可用 class 微調(如 `rounded-full`、漸層底);客製時遵循上方設計系統
+- 主題已調校:`src/style.css` 的 `:root` CSS 變數已對應像素街機系統(`--background` 亮冷白、`--primary` 皇家藍、`--border`/`--input` 海軍藍、`--radius` 0rem)。**網站是亮色主題,不使用 `.dark` class 切換**
+- 元件預設樣式已大致貼合網站,可用 class 微調(如加 `pixel-box`、`border-2`);客製時遵循上方設計系統
 - 注意:執行 shadcn-vue CLI 後檢查 `src/style.css` 是否被塞回 Google Fonts 的 Geist `@import` — 網站字體是 system-ui,該行要移除
 - 純展示性的卡片/標籤若既有 section 已有手刻樣式(如 ProjectsSection 的卡片),維持原有寫法即可,不必改用 shadcn-vue
 
@@ -106,7 +120,7 @@ UI 是中英混排,有固定分工:
 
 - 資料(作品清單、連結、技能等)直接寫成 `<script setup>` 內的 `const` 陣列物件,不抽離成 JSON 或獨立檔案 — 範例見 `ProjectsSection.vue` 的 `projects` 陣列
 - 純展示元件可以只有 `<template>`(如 `FooterBar.vue`),不必硬加空的 script
-- 需要動畫時優先用 Tailwind utility;Tailwind 做不到的才在 `<style scoped>` 寫 `@keyframes`(如 Hero 的打字機游標)
+- 需要動畫時優先用 Tailwind utility 或 style.css 既有的 `animate-blink-px`;新動畫記得在 `prefers-reduced-motion: reduce` 下停用
 - 有計時器或事件監聽時,務必在 `onUnmounted` 清理
 - 不寫註解,除非是標示 template 區域的簡短英文註解(如 `<!-- background glow -->`)
 
